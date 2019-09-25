@@ -21,7 +21,7 @@ def HoughLines(edges):
                     hspace[theta//theta_inc,d+max_dist] += 1
                     
     lines = np.zeros((edges.shape[0],edges.shape[1],3))
-    thresh = 0.6*hspace.max()
+    thresh = 0.7*hspace.max()
     for i in range(hspace.shape[0]):
         for j in range(hspace.shape[1]):
             if hspace[i,j] >= thresh:
