@@ -218,18 +218,26 @@ def LaneDetection(img, prev_best_two=None):
     if lines is None:
         return img, None
     avg_lines, best_two = avg_of_line_groups(lines)
-    prob = 0.9
+    prob = 0.88
     if prev_best_two is not None:
+        diff_best_two = 0
         for i in range(2):
-            best_two[i] = [best_two[i][0] * (1-prob) + prev_best_two[i][0] * prob, best_two[i][1] * (1-prob) + prev_best_two[i][1] * prob]
+            diff_best_two += np.abs(prev_best_two[i][0] - best_two[i][0])
+        if diff_best_two > 50:
+            best_two = prev_best_two
+        else:
+            for i in range(2):
+                best_two[i] = [best_two[i][0] * (1-prob) + prev_best_two[i][0] * prob, best_two[i][1] * (1-prob) + prev_best_two[i][1] * prob]
     img_lines = draw_lines(img, best_two)
     img_rect = draw_lane_rect(img, best_two)
     return img_rect, best_two
 
+# def create_mask(img):
+#
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture('vids/test1.mp4')
-    out = cv2.VideoWriter('project.mp4', cv2.VideoWriter_fourcc(*'MP42'), 15, (1280, 720))
+    # out = cv2.VideoWriter('project.mp4', cv2.VideoWriter_fourcc(*'MP42'), 15, (1280, 720))
 
     best_two = None
     while (cap.isOpened()):
@@ -246,12 +254,12 @@ if __name__ == '__main__':
             # frame = cv2.normalize(src=frame, dst=None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)
 
             cv2.imshow('frame', frame)
-            out.write(frame)
+            # out.write(frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         else:
             cap.release()
-            out.release()
+            # out.release()
 
     cv2.destroyAllWindows()
